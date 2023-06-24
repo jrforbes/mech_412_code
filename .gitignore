@@ -15,8 +15,6 @@
 *.toc
 *.bak
 
-# LaTeX keep
-!**/figs/*.pdf
 # Ignore EPS conversions
 *-eps-converted-to.pdf
 
