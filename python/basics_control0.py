@@ -33,9 +33,10 @@ def nyq(G, wmin, wmax):
 
     # Plot Nyquist plot
     fig, ax = plt.subplots()
-    ax.set_xlabel(r'$Re$')
-    ax.set_ylabel(r'$Im$')
-    ax.plot(-1, 0, '+', color='C3')
+    ax.set_xlabel(r'Real axis')
+    ax.set_ylabel(r'Imaginary axis')
+    ax.plot(-1, 0, '+', color='C3')  # -1 point
+    ax.plot(Re_G[0], Im_G[0], 'o', color='C0')  # Starting point
     ax.plot(Re_G, Im_G, color='C0')
     ax.plot(Re_G, -Im_G, '--', color='C0')
 
@@ -51,9 +52,7 @@ plt.rc('axes', grid=True)
 plt.rc('grid', linestyle='--')
 
 # time
-dt = 1e-2
-t_start = 0
-t_end = 5
+t_start, t_end, dt = 0, 5, 1e-2
 t = np.arange(t_start, t_end, dt)
 
 # %%
@@ -312,12 +311,12 @@ fig, ax = plt.subplots(2, 1)
 ax[0].semilogx(w_L, mag_L_dB)
 ax[0].semilogx(omega_pc, -gain_margin, 'o', color='C3')
 ax[0].set_xlabel(r'$\omega$ (rad/s)')
-ax[0].set_ylabel(r'$|L(\omega)|$ (dB)')
+ax[0].set_ylabel(r'$|L(j\omega)|$ (dB)')
 # Phase plot
 ax[1].semilogx(w_L, phase_L_deg)
 ax[1].semilogx(omega_gc, phase_at_omega_gc, 'o', color='C3')
 ax[1].set_xlabel(r'$\omega$ (rad/s)')
-ax[1].set_ylabel(r'$\angle L(\omega)$ (deg)')
+ax[1].set_ylabel(r'$\angle L(j\omega)$ (deg)')
 # fig.savefig('figs/control_L_Bode_plot.pdf')
 
 # Margins of L_e(s) = 3 / (s**2 + s) / (s + 2)
@@ -366,19 +365,19 @@ fig, ax = plt.subplots(2, 2)
 # Magnitude plot of S
 ax[0, 0].semilogx(w_S, mag_S_dB)
 ax[0, 0].set_xlabel(r'$\omega$ (rad/s)')
-ax[0, 0].set_ylabel(r'$|S(\omega)|$ (dB)')
+ax[0, 0].set_ylabel(r'$|S(j\omega)|$ (dB)')
 # Magnitude plot of P * S
 ax[0, 1].semilogx(w_PS, mag_PS_dB)
 ax[0, 1].set_xlabel(r'$\omega$ (rad/s)')
-ax[0, 1].set_ylabel(r'$|P(\omega)S(\omega)|$ (dB)')
+ax[0, 1].set_ylabel(r'$|P(j\omega)S(j\omega)|$ (dB)')
 # Magnitude plot of C * S
 ax[1, 0].semilogx(w_CS, mag_CS_dB)
 ax[1, 0].set_xlabel(r'$\omega$ (rad/s)')
-ax[1, 0].set_ylabel(r'$|C(\omega)S(\omega)|$ (dB)')
+ax[1, 0].set_ylabel(r'$|C(j\omega)S(j\omega)|$ (dB)')
 # Magnitude plot of T
 ax[1, 1].semilogx(w_T, mag_T_dB)
 ax[1, 1].set_xlabel(r'$\omega$ (rad/s)')
-ax[1, 1].set_ylabel(r'$|T(\omega)|$ (dB)')
+ax[1, 1].set_ylabel(r'$|T(j\omega)|$ (dB)')
 fig.tight_layout()
 # fig.savefig('figs/control_Gof4_Bode_plot.pdf')
 

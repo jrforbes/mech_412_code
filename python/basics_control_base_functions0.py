@@ -25,9 +25,7 @@ plt.rc('axes', grid=True)
 plt.rc('grid', linestyle='--')
 
 # time
-dt = 1e-2
-t_start = 0
-t_end = 5
+t_start, t_end, dt = 0, 5, 1e-2
 t = np.arange(t_start, t_end, dt)
 
 # %%
