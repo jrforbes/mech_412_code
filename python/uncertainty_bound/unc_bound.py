@@ -47,14 +47,14 @@ import numpy as np
 from scipy import optimize as opt
 
 
-def residuals(P_nom, P_k):
-    """Compute the residuals between P_nom and P_k.
+def residuals(P_nom, P_off_nom):
+    """Compute the residuals between P_nom and P_off_nom.
 
     Parameters
     ----------
     P_nom : control.TransferFunction
         Nominal transfer function.
-    P_k : List[control.TransferFunction]
+    P_off_nom : List[control.TransferFunction]
         Off-nominal transfer functions.
 
     Returns
@@ -64,7 +64,7 @@ def residuals(P_nom, P_k):
         transfer funciton.
     """
     # Number of off-nominal plants.
-    R = [plant / P_nom - 1 for plant in P_k]
+    R = [plant / P_nom - 1 for plant in P_off_nom]
     return R
 
 

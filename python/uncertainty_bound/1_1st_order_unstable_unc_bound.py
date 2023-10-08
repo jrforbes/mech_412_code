@@ -41,11 +41,11 @@ P5 = 2.4 / (s - 2.2)
 P6 = 1.6 / (s - 1.8)
 
 # Uncertain plants as a list
-P_k = [P1, P2, P3, P4, P5, P6]
-N = len(P_k)
+P_off_nom = [P1, P2, P3, P4, P5, P6]
+N = len(P_off_nom)
 
 # Compute residules
-R = unc_bound.residuals(P, P_k)
+R = unc_bound.residuals(P, P_off_nom)
 
 # %%
 # Bode plot
