@@ -79,7 +79,7 @@ G2 = ((s / wb2)**2 + 2 * zb2 / wb2 * s + 1) / (
 W20 = kappa * G1 * G2
 
 # Compute magnitude part of W_2(s) in absolute units
-mag_W20_abs, _, w = control.bode(W20, w_shared, plot=False)
+mag_W20_abs, _, _ = control.bode(W20, w_shared, plot=False)
 # Copmute magnitude part of W_2(s) in dB
 mag_W20_dB = 20 * np.log10(mag_W20_abs)
 
@@ -93,18 +93,18 @@ for i in range(N):
     mag_abs, _, _ = control.bode(R[i], w_shared, plot=False)
     mag_dB = 20 * np.log10(mag_abs)
     # Magnitude plot (dB)
-    ax[0].semilogx(w, mag_dB, '--', color='C0', linewidth=1)
+    ax[0].semilogx(w_shared, mag_dB, '--', color='C0', linewidth=1)
     # Magnitude plot (absolute).
-    ax[1].semilogx(w, mag_abs, '--', color='C0', linewidth=1)
+    ax[1].semilogx(w_shared, mag_abs, '--', color='C0', linewidth=1)
 
 # Magnitude plot (dB).
-ax[0].semilogx(w, mag_max_dB, '-', color='C4', label='upper bound')
+ax[0].semilogx(w_shared, mag_max_dB, '-', color='C4', label='upper bound')
 # Magnitude plot (absolute).
-ax[1].semilogx(w, mag_max_abs, '-', color='C4', label='upper bound')
+ax[1].semilogx(w_shared, mag_max_abs, '-', color='C4', label='upper bound')
 # Magnitude plot (dB).
-ax[0].semilogx(w, mag_W20_dB, '-', color='C1', label='initial bound')
+ax[0].semilogx(w_shared, mag_W20_dB, '-', color='C1', label='initial bound')
 # Magnitude plot (absolute).
-ax[1].semilogx(w, mag_W20_abs, '-', color='C1', label='initial bound')
+ax[1].semilogx(w_shared, mag_W20_abs, '-', color='C1', label='initial bound')
 ax[0].legend(loc='lower right')
 ax[1].legend(loc='upper left')
 # fig.savefig(path.joinpath('1st_order_unstable_R_W2_IC.pdf'))
@@ -157,7 +157,7 @@ mag_W2_dB = 20 * np.log10(mag_W2_abs)
 
 # Plot the opimization objective function as a function of iterations
 fig, ax = plt.subplots()
-ax.set_xlabel(r'iteration, k')
+ax.set_xlabel(r'iteration, $k$')
 ax.set_ylabel(r'objective function, $f(x)$')
 ax.semilogy(objhist, '-', color='C3', label=r'$f(x_k)$')
 ax.legend(loc='upper right')
@@ -175,18 +175,18 @@ for i in range(N):
     mag_abs, _, _ = control.bode(R[i], w_shared, plot=False)
     mag_dB = 20 * np.log10(mag_abs)
     # Magnitude plot (dB)
-    ax[0].semilogx(w, mag_dB, '--', color='C0', linewidth=1)
+    ax[0].semilogx(w_shared, mag_dB, '--', color='C0', linewidth=1)
     # Magnitude plot (absolute).
-    ax[1].semilogx(w, mag_abs, '--', color='C0', linewidth=1)
+    ax[1].semilogx(w_shared, mag_abs, '--', color='C0', linewidth=1)
 
 # Magnitude plot (dB).
-ax[0].semilogx(w, mag_max_dB, '-', color='C4', label='upper bound')
+ax[0].semilogx(w_shared, mag_max_dB, '-', color='C4', label='upper bound')
 # Magnitude plot (absolute).
-ax[1].semilogx(w, mag_max_abs, '-', color='C4', label='upper bound')
+ax[1].semilogx(w_shared, mag_max_abs, '-', color='C4', label='upper bound')
 # Magnitude plot (dB).
-ax[0].semilogx(w, mag_W2_dB, '-', color='seagreen', label='optimal bound')
+ax[0].semilogx(w_shared, mag_W2_dB, '-', color='seagreen', label='optimal bound')
 # Magnitude plot (absolute).
-ax[1].semilogx(w, mag_W2_abs, '-', color='seagreen', label='optimal bound')
+ax[1].semilogx(w_shared, mag_W2_abs, '-', color='seagreen', label='optimal bound')
 ax[0].legend(loc='lower right')
 ax[1].legend(loc='upper left')
 # fig.tight_layout()

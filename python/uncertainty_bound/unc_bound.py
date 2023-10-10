@@ -3,6 +3,8 @@
 James Forbes and Steven Dahdah
 2023/10/07
 
+Inspired from demo given by Prof. Andrew Ning (BYU).
+
 To use this module, first call::
 
     R = unc_bound.residuals(P_nominal, P_off_nominal)
@@ -172,7 +174,7 @@ def run_optimization(x0, lb, ub, max_iter, params, constraint_params):
         """
         # Nonlocal needed becuase the variable is being modified.
         nonlocal objhist
-        # Call the function structure that will output mass and stress.
+        # Call the objective and constraints function.
         f, g = _obj_and_constraints(x, params, constraint_params)
         # Append objective history.
         objhist.append(f)
