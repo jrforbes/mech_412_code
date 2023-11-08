@@ -149,16 +149,16 @@ fig_L.set_size_inches(height * gr, height, forward=True)
 ax.legend(loc='lower left')
 '''
 
-fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
-fig_L_W1_W2_inv.set_size_inches(height * gr, height, forward=True)
-ax.legend(loc='lower left')
-
-fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
-fig_L_W1_W2_inv.set_size_inches(height * gr, height, forward=True)
-ax.legend(loc='lower left')
-
 fig_S_T, ax = srp.bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
 ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
+fig_L_W1_W2_inv.set_size_inches(height * gr, height, forward=True)
+ax.legend(loc='lower left')
+
+fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
+fig_L_W1_W2_inv.set_size_inches(height * gr, height, forward=True)
+ax.legend(loc='lower left')
 
 fig_RP, ax = srp.bode_mag_rob_perf(P, C, W1, W2, w_shared)
 fig_RP.set_size_inches(height * gr, height, forward=True)
@@ -203,6 +203,7 @@ fig_Nyquist.tight_layout()
 
 '''
 # fig_L.savefig('figs/L_C1.pdf')
+# fig_S_T.savefig('figs/S_T_C1.pdf')
 fig_L_W1_W2_inv.savefig('figs/L_W1_W2_inv_C1.pdf')
 fig_L_W1_W2_inv.savefig('figs/L_W1_W2_inv_C1.pdf')
 fig_RP.savefig('figs/RP_C1.pdf')
@@ -227,6 +228,9 @@ fig_L, ax = srp.bode_mag_L(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w
 fig_L.set_size_inches(height * gr, height, forward=True)
 ax.legend(loc='lower left')
 '''
+
+fig_S_T, ax = srp.bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
+ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
 fig_L_W1_W2_inv.set_size_inches(height * gr, height, forward=True)
@@ -275,6 +279,7 @@ fig_Nyquist.tight_layout()
 
 '''
 # fig_L.savefig('figs/L_C2.pdf')
+# fig_S_T.savefig('figs/S_T_C2.pdf')
 fig_L_W1_W2_inv.savefig('figs/L_W1_W2_inv_C2.pdf')
 fig_RP.savefig('figs/RP_C2.pdf')
 fig_RP_RD.savefig('figs/RP_RD_C2.pdf')
@@ -298,6 +303,9 @@ fig_L, ax = srp.bode_mag_L(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w
 fig_L.set_size_inches(height * gr, height, forward=True)
 ax.legend(loc='lower left')
 '''
+
+fig_S_T, ax = srp.bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
+ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
 fig_L_W1_W2_inv.set_size_inches(height * gr, height, forward=True)
@@ -346,6 +354,7 @@ fig_Nyquist.tight_layout()
 
 '''
 # fig_L.savefig('figs/L_C3.pdf')
+# fig_S_T.savefig('figs/S_T_C3.pdf')
 fig_L_W1_W2_inv.savefig('figs/L_W1_W2_inv_C3.pdf')
 fig_RP.savefig('figs/RP_C3.pdf')
 fig_RP_RD.savefig('figs/RP_RD_C3.pdf')
@@ -370,6 +379,9 @@ fig_L, ax = srp.bode_mag_L(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w
 fig_L.set_size_inches(height * gr, height, forward=True)
 ax.legend(loc='lower left')
 '''
+
+fig_S_T, ax = srp.bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
+ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
 fig_L_W1_W2_inv.set_size_inches(height * gr, height, forward=True)
@@ -418,6 +430,7 @@ fig_Nyquist.tight_layout()
 
 '''
 # fig_L.savefig('figs/L_C4.pdf')
+# fig_S_T.savefig('figs/S_T_C4.pdf')
 fig_L_W1_W2_inv.savefig('figs/L_W1_W2_inv_C4.pdf')
 fig_RP.savefig('figs/RP_C4.pdf')
 fig_RP_RD.savefig('figs/RP_RD_C4.pdf')
@@ -452,7 +465,7 @@ _, r = control.forced_response(1 / (1 / a * s + 1), t, r, 0)
 
 # Noise
 np.random.seed(123321)
-mu, sigma = 0, 3 * gamma_n
+mu, sigma = 0, 1 * gamma_n
 noise_raw = np.random.normal(mu, sigma, n_t)
 # Butterworth filter, high pass
 b_bf, a_bf = signal.butter(6, w_n_l, 'high', analog=True)
