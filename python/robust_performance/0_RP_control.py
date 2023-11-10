@@ -77,7 +77,7 @@ P_off_nom = [P * (1 + W2 * i / N_off_nom) for i in range(-N_off_nom, N_off_nom +
 # Performance
 
 # Noise and reference bounds
-gamma_r, w_r_h = 10**(-10 / 20), 0.5
+gamma_r, w_r_h = 10**(-5 / 20), 0.35
 gamma_d, w_d_h = 10**(-5 / 20), 0.05
 gamma_n, w_n_l = 10**(-40 / 20), 20
 gamma_u, w_u_l = 10**(-10 / 20), 20
