@@ -97,9 +97,9 @@ gamma_u_dB = 20 * np.log10(gamma_u) * np.ones(w_u.shape[0],)
 # Weight W_1(s) according to Zhou et al.
 k = 2
 epsilon = 10**(-40 / 20)
-Ms = 10**(40 / 20)
+M1 = 10**(40 / 20)
 w1 = 0.5
-W1 = ((s / Ms**(1 / k) + w1) / (s + w1 * (epsilon)**(1 / k)))**k
+W1 = ((s / M1**(1 / k) + w1) / (s + w1 * (epsilon)**(1 / k)))**k
 W1_inv = 1 / W1
 
 
