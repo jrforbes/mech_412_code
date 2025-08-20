@@ -89,8 +89,8 @@ print(f'The real part CP roots are {np.real(char_poly_roots)}\n')
 
 # A plant * controller with an interesting Bode plot and Nyquist plot
 L_e = 3 / (s**2 + s) / (s + 2)
-print(f'plant zeros = {control.zero(L_e)}\n')
-print(f'plant poles = {control.pole(L_e)}\n')
+print(f'plant zeros = {control.zeros(L_e)}\n')
+print(f'plant poles = {control.poles(L_e)}\n')
 
 
 # %%
@@ -126,7 +126,7 @@ fig.tight_layout()
 # Impulse response
 t_a, y_a = control.impulse_response(P_a, t)
 t_b, y_b = control.impulse_response(P_b, t)
-t_c, y_c = control.impulse_response(P_c, t, x0)
+t_c, y_c = control.impulse_response(P_c, t)
 t_T, y_T = control.impulse_response(T, t)
 
 # Plot impulse response
@@ -188,9 +188,12 @@ fig.tight_layout()
 # Calculate freq, magnitude, and phase
 w_shared = np.logspace(-3, 3, 1000)
 # Note, can use plot=False
-mag_a, phase_a, w_a = control.bode(P_a, w_shared, dB=True, deg=True)
-mag_b, phase_b, w_b = control.bode(P_b, w_shared, dB=True, deg=True)
-mag_T, phase_T, w_T = control.bode(T, w_shared, dB=True, deg=True)
+mag_a, phase_a, w_a = control.frequency_response(P_a, w_shared)
+control.bode_plot(P_a, w_shared, dB=True, deg=True, label=r"$P_a(s)$")
+mag_b, phase_b, w_b = control.frequency_response(P_b, w_shared)
+control.bode_plot(P_b, w_shared, dB=True, deg=True, label=r"$P_b(s)$")
+mag_T, phase_T, w_T = control.frequency_response(T, w_shared)
+control.bode_plot(T, w_shared, dB=True, deg=True, label=r"$P_c(s)$")
 # fig.savefig('figs/control_Bode_plot_T.pdf')
 
 # %%
@@ -240,7 +243,7 @@ control.gangof4_plot(P_d, C_PI, omega=w_shared)  # [[S, PS], [CS, T]]
 # %%
 # Root locus
 fig, ax = plt.subplots()
-rlist, klist = control.root_locus(L, grid=False)  # plot=True, grid=True
+rlist, klist = control.root_locus(L, plot=True)  # plot=True, grid=True
 
 
 # %%
@@ -250,3 +253,5 @@ print(f'The DC gain of T(s) is {DC_gain_T}.')
 
 # %%
 plt.show()
+
+# %%
