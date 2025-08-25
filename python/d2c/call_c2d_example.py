@@ -116,3 +116,4 @@ fig.tight_layout()
 # %%
 # Plot show
 plt.show()
+# %%

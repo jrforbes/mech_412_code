@@ -23,11 +23,13 @@ def nyq(G, wmin, wmax):
     """Plot nyquist plot, output if stable or not."""
     # Frequency
     w_shared = np.logspace(wmin, wmax, 1000)
-    # Call control.nyquist to get the count of the -1 point
-    count_G = control.nyquist_plot(G, omega=w_shared, plot=False)
+    # Call control.nyquist_response to get the count of the -1 point
+    response = control.nyquist_response(G, omega=w_shared)
+    count_G = response.count
+    
 
-    # Use control.bode to extract mag and phase information
-    mag_G, phase_G, w_G = control.bode(G, w_shared, plot=False)
+    # Use control.frequency_response to extract mag and phase information
+    mag_G, phase_G, _ = control.frequency_response(G, w_shared)
     Re_G = mag_G * np.cos(phase_G)
     Im_G = mag_G * np.sin(phase_G)
 
@@ -57,7 +59,7 @@ t = np.arange(t_start, t_end, dt)
 
 # %%
 # Create systems
-# Firsr-order transfer function, P(s) = 1 / (tau * s + 1)
+# First-order transfer function, P(s) = 1 / (tau * s + 1)
 tau = 1 / 10
 P_a = control.tf([1], [tau, 1])
 
@@ -73,10 +75,8 @@ P_b = omega**2 * (1 / b * s + 1) / (s**2 + 2 * zeta * omega * s + omega**2)
 # P_b = control.tf([omega**2 / b, omega**2], [1, 2 * zeta * omega, omega**2])
 P_b_num = np.array(P_b.num).ravel()
 P_b_den = np.array(P_b.den).ravel()
-# P_b_zeros = np.roots(P_b_num)
-# P_b_poles = np.roots(P_b_den)
-P_b_zeros = P_b.zero()
-P_b_poles = P_b.pole()
+P_b_zeros = np.roots(P_b_num)
+P_b_poles = np.roots(P_b_den)
 
 print(f'plant num = {P_b_num}\n')
 print(f'plant den = {P_b_den}\n')
@@ -90,7 +90,7 @@ A_b, B_b, C_b, D_b = P_b_ss.A, P_b_ss.B, P_b_ss.C, P_b_ss.D
 m = 1  # kg, mass
 d = 0.05  # N s / m, damper
 k = 1  # N / m, spring
-# Form state-space matrics.
+# Form state-space matrices.
 A = np.array([[0, 1],
               [-k / m, -d / m]])
 B = np.array([[0],
@@ -125,11 +125,11 @@ print(f'The real part CP roots are {np.real(char_poly_roots)}\n')
 
 # A plant * controller with an interesting Bode plot and Nyquist plot
 L_e = 3 / (s**2 + s) / (s + 2)
-print(f'plant zeros = {control.zero(L_e)}\n')
-print(f'plant poles = {control.pole(L_e)}\n')
+print(f'plant zeros = {control.zeros(L_e)}\n')
+print(f'plant poles = {control.poles(L_e)}\n')
 
 # %%
-# Sysetm interconnctions
+# System interconnections
 # Feedback interconnection of plant and control
 # Complementary sensitivity transfer function
 T = control.feedback(L, 1, -1)
@@ -162,7 +162,7 @@ plt.show()
 # Impulse response
 t_a, y_a = control.impulse_response(P_a, t)
 t_b, y_b = control.impulse_response(P_b, t)
-t_c, y_c = control.impulse_response(P_c, t, x0)
+t_c, y_c = control.impulse_response(P_c, t)
 t_T, y_T = control.impulse_response(T, t)
 
 # Plot impulse response
@@ -226,12 +226,11 @@ plt.show()
 # Bode plots
 # Calculate freq, magnitude, and phase
 w_shared = np.logspace(-3, 3, 1000)
-mag_a, phase_a, w_a = control.bode(P_a, w_shared, plot=False)
-mag_b, phase_b, w_b = control.bode(P_b, w_shared, plot=False)
-mag_T, phase_T, w_T = control.bode(T, w_shared, plot=False)
+mag_a, phase_a, w_a = control.frequency_response(P_a, w_shared)
+mag_b, phase_b, w_b = control.frequency_response(P_b, w_shared)
+mag_T, phase_T, w_T = control.frequency_response(T, w_shared)
 
 # Convert to dB and deg.
-# Can also use dB=True, deg=True in control.bode
 mag_a_dB = 20 * np.log10(mag_a)
 phase_a_deg = phase_a / np.pi * 180
 mag_b_dB = 20 * np.log10(mag_b)
@@ -271,7 +270,7 @@ ax[0].legend(loc='upper right')
 # %%
 # Gain and phase margin
 # From https://jckantor.github.io/CBE30338/05.03-Creating-Bode-Plots.html
-mag_L, phase_L, w_L = control.bode(L, w_shared, plot=False)
+mag_L, phase_L, w_L = control.frequency_response(L, w_shared)
 mag_L_dB = 20 * np.log10(mag_L)  # Convert to dB
 phase_L_deg = phase_L / np.pi * 180
 
@@ -288,7 +287,7 @@ phase_margin = 180 + phase_at_omega_gc
 print(f'Phase margin is', phase_margin, '(deg) at gain crossover frequency',
       omega_gc, '(rad/s)\n')
 
-# Compaire to control.margin
+# Compare to control.margin
 gm, pm, wpc, wgc = control.margin(L)
 gm_dB = 20 * np.log10(gm)  # Convert to dB
 print(f'Gain margin is', gm_dB, '(dB) at phase crossover frequency',
@@ -296,7 +295,7 @@ print(f'Gain margin is', gm_dB, '(dB) at phase crossover frequency',
 print(f'Phase margin is', pm, '(deg) at gain crossover frequency',
       wgc, '(rad/s))\n')
 
-# Compaire to control.stability_margins
+# Compare to control.stability_margins
 gm, pm, vm, wpc, wgc, wvm = control.stability_margins(L)
 gm_dB = 20 * np.log10(gm)  # Convert to dB
 print(f'Gain margin is', gm_dB, '(dB) at phase crossover frequency',
@@ -333,24 +332,27 @@ print(f'Vector margin is', vm, 'at frequency', wvm, '(deg)')
 count_b_nyq = nyq(P_b, -3, 3)
 # fig.savefig('figs/control_Nyquist_plot_P_b.pdf')
 
-fig, ax = plt.subplots()
-count_b, contour_b = control.nyquist_plot(L, omega=w_shared, plot=True,
-                                          return_contour=True)
-print('\n')
-print(f'Number of encirclements of the -1 is {count_b}.')
+response = control.nyquist_response(L, omega=w_shared)
+count_L = response.count
+print(f'Number of encirclements of the -1 is {count_L}.')
 
-# See also control.freqresp()
+# Plot Nyquist plot of L
+fig, ax = plt.subplots()
+response.plot()
+fig.tight_layout()
+plt.show()
+# fig.savefig('figs/nyquist.pdf')
+
 
 # %%
 # Plot gang of 4
-fig, ax = plt.subplots()
 control.gangof4_plot(P_d, C_PI, omega=w_shared)  # [[S, PS], [CS, T]]
 
 # Compare to custom gang of 4 code
-mag_T, phase_T, w_T = control.bode(T, w_shared, plot=False)
-mag_S, phase_S, w_S = control.bode(S, w_shared, plot=False)
-mag_PS, phase_PS, w_PS = control.bode(P_d * S, w_shared, plot=False)
-mag_CS, phase_CS, w_CS = control.bode(C_PI * S, w_shared, plot=False)
+mag_T, phase_T, w_T = control.frequency_response(T, w_shared)
+mag_S, phase_S, w_S = control.frequency_response(S, w_shared)
+mag_PS, phase_PS, w_PS = control.frequency_response(P_d * S, w_shared)
+mag_CS, phase_CS, w_CS = control.frequency_response(C_PI * S, w_shared)
 
 mag_T_dB = 20 * np.log10(mag_T)
 phase_T_deg = phase_T / np.pi * 180
@@ -389,8 +391,11 @@ print(f'The DC gain of T(s) is {DC_gain_T}.')
 # %%
 # Root locus
 fig, ax = plt.subplots()
-rlist, klist = control.root_locus(L, grid=False)  # plot=True, grid=True
+rlist, klist = control.root_locus(L, plot=True)  # deprecated; use root_locus_map()
+
 
 # %%
 # Plot show
 plt.show()
+
+# %%

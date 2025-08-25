@@ -57,7 +57,7 @@ print(f'plant poles = {P_b_poles}\n')
 m = 1  # kg, mass
 d = 0.05  # N s / m, damper
 k = 1  # N / m, spring
-# Form state-space matrics.
+# Form state-space matrices.
 A = np.array([[0, 1],
               [-k / m, -d / m]])
 B = np.array([[0],
@@ -94,7 +94,7 @@ print(f'plant poles = {control.poles(L_e)}\n')
 
 
 # %%
-# Sysetm interconnctions
+# System interconnections
 # Feedback interconnection of plant and control
 # Complementary sensitivity transfer function
 T = control.feedback(L, 1, -1)
@@ -198,7 +198,7 @@ control.bode_plot(T, w_shared, dB=True, deg=True, label=r"$P_c(s)$")
 
 # %%
 # Gain and phase margin
-# Compaire to control.margin
+# Compare to control.margin
 gm, pm, wpc, wgc = control.margin(L)
 gm_dB = 20 * np.log10(gm)  # Convert to dB
 print(f'Gain margin is', gm_dB, '(dB) at phase crossover frequency',
@@ -206,7 +206,7 @@ print(f'Gain margin is', gm_dB, '(dB) at phase crossover frequency',
 print(f'Phase margin is', pm, '(deg) at gain crossover frequency',
       wgc, '(deg)\n')
 
-# Compaire to control.stability_margins
+# Compare to control.stability_margins
 gm, pm, vm, wpc, wgc, wvm = control.stability_margins(L)
 gm_dB = 20 * np.log10(gm)  # Convert to dB
 print(f'Gain margin is', gm_dB, '(dB) at phase crossover frequency',
@@ -226,24 +226,27 @@ print(f'Vector margin is', vm, 'at frequency', wvm, '(rad/s)')
 
 # %%
 # Nyquist plot
-fig, ax = plt.subplots()
-count_b, contour_b = control.nyquist_plot(L, omega=w_shared,
-                                          plot=True, return_contour=True)
-print('\n')
-print(f'Number of encirclements of the -1 is {count_b}.')
+response = control.nyquist_response(L, omega=w_shared)
+count_L = response.count
+print(f'Number of encirclements of the -1 is {count_L}.')
 
-# See also control.freqresp()
+# Plot Nyquist plot of L
+fig, ax = plt.subplots()
+response.plot()
+fig.tight_layout()
+plt.show()
+# fig.savefig('figs/nyquist.pdf')
 
 # %%
 # Plot gang of 4
-fig, ax = plt.subplots()
 control.gangof4_plot(P_d, C_PI, omega=w_shared)  # [[S, PS], [CS, T]]
 # fig.savefig('figs/control_Gof4_Bode_plot.pdf')
+
 
 # %%
 # Root locus
 fig, ax = plt.subplots()
-rlist, klist = control.root_locus(L, plot=True)  # plot=True, grid=True
+rlist, klist = control.root_locus(L, plot=True)  # deprecated; use root_locus_map()
 
 
 # %%
