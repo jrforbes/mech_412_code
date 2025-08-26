@@ -23,11 +23,11 @@ def nyq(G, wmin, wmax):
     """Plot nyquist plot, output if stable or not."""
     # Frequency
     w_shared = np.logspace(wmin, wmax, 1000)
+
     # Call control.nyquist_response to get the count of the -1 point
     response = control.nyquist_response(G, omega=w_shared)
     count_G = response.count
     
-
     # Use control.frequency_response to extract mag and phase information
     mag_G, phase_G, _ = control.frequency_response(G, w_shared)
     Re_G = mag_G * np.cos(phase_G)

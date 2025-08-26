@@ -1,4 +1,4 @@
-"""Siso robust performance tools.
+"""SISO robust performance tools.
 
 James Forbes
 2023/09/26
@@ -29,7 +29,8 @@ def robust_nyq(P, P_off_nom, W2, wmin, wmax, N_w):
     w_shared = np.logspace(wmin, wmax, N_w)
 
     # Call control.nyquist to get the count of the -1 point
-    count_P = control.nyquist_plot(P, omega=w_shared, plot=False)
+    response = control.nyquist_response(P, omega=w_shared)
+    count_P = response.count
 
     # Set Nyquist plot up
     fig, ax = plt.subplots()
@@ -39,8 +40,8 @@ def robust_nyq(P, P_off_nom, W2, wmin, wmax, N_w):
 
     # Plot uncertain systems
     for k in range(len(P_off_nom)):
-        # Use control.bode to extract mag and phase information
-        mag_P_off_nom, phase_P_off_nom, _ = control.bode(P_off_nom[k], w_shared, plot=False)
+        # Use control.frequency_response to extract mag and phase information
+        mag_P_off_nom, phase_P_off_nom, _ = control.frequency_response(P_off_nom[k], w_shared)
         Re_P_off_nom = mag_P_off_nom * np.cos(phase_P_off_nom)
         Im_P_off_nom = mag_P_off_nom * np.sin(phase_P_off_nom)
 
@@ -48,7 +49,7 @@ def robust_nyq(P, P_off_nom, W2, wmin, wmax, N_w):
         ax.plot(Re_P_off_nom, Im_P_off_nom, color='C0', linewidth=0.75)
 
     # Plot nominal system
-    mag_P, phase_P, _ = control.bode(P, w_shared, plot=False)
+    mag_P, phase_P, _ = control.frequency_response(P, w_shared)
     Re_P = mag_P * np.cos(phase_P)
     Im_P = mag_P * np.sin(phase_P)
 
@@ -57,8 +58,8 @@ def robust_nyq(P, P_off_nom, W2, wmin, wmax, N_w):
 
     # Plot circles
     w_circle = np.geomspace(10**wmin, 10**wmax, 50)
-    mag_P_W2, _, _ = control.bode(P * W2, w_circle, plot=False)
-    mag_P, phase_P, _ = control.bode(P, w_circle, plot=False)
+    mag_P_W2, _, _ = control.frequency_response(P * W2, w_circle)
+    mag_P, phase_P, _ = control.frequency_response(P, w_circle)
     Re_P = mag_P * np.cos(phase_P)
     Im_P = mag_P * np.sin(phase_P)
     for k in range(w_circle.size):
@@ -71,10 +72,10 @@ def robust_nyq(P, P_off_nom, W2, wmin, wmax, N_w):
 def bode_mag_W1_W2(W1, W2, w_d_h, w_n_l, w_shared):
     """Plot W1 and W2."""
     # Frequency response
-    mag_W1, _, _ = control.bode(W1, w_shared, plot=False)
+    mag_W1, _, _ = control.frequency_response(W1, w_shared)
     mag_W1_dB = 20 * np.log10(mag_W1)
 
-    mag_W2, _, _ = control.bode(W2, w_shared, plot=False)
+    mag_W2, _, _ = control.frequency_response(W2, w_shared)
     mag_W2_dB = 20 * np.log10(mag_W2)
 
     # Plot
@@ -101,11 +102,11 @@ def bode_mag_W1_inv_W2_inv(W1, W2, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shar
 
     # Frequency response
     W1_inv = 1 / W1
-    mag_W1_inv, _, _ = control.bode(W1_inv, w_shared, plot=False)
+    mag_W1_inv, _, _ = control.frequency_response(W1_inv, w_shared)
     mag_W1_inv_dB = 20 * np.log10(mag_W1_inv)
 
     W2_inv = 1 / W2
-    mag_W2_inv, _, _ = control.bode(W2_inv, w_shared, plot=False)
+    mag_W2_inv, _, _ = control.frequency_response(W2_inv, w_shared)
     mag_W2_inv_dB = 20 * np.log10(mag_W2_inv)
 
     # Plot
@@ -137,7 +138,7 @@ def bode_mag_L(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high
     L = control.minreal(P * C)
 
     # Frequency response
-    mag_L, phase_L, w_L = control.bode(L, w_shared, plot=False)
+    mag_L, phase_L, w_L = control.frequency_response(L, w_shared)
     mag_L_dB = 20 * np.log10(mag_L)
     phase_L_deg = phase_L / np.pi * 180
 
@@ -165,17 +166,17 @@ def bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_
 
     # W1 and W2 inverse
     w_mid = np.floor((w_shared_low + w_shared_high) / 2)
-    mag_W1_low_freq, _, w_W1_low_freq = control.bode(W1, np.logspace(w_shared_low, w_mid, 100), plot=False)
+    mag_W1_low_freq, _, w_W1_low_freq = control.frequency_response(W1, np.logspace(w_shared_low, w_mid, 100))
     mag_W1_low_freq_dB = 20 * np.log10(mag_W1_low_freq)  # Convert to dB
 
-    mag_W2_inv_high_freq, _, w_W2_inv_high_freq = control.bode(1 / W2, np.logspace(w_mid, w_shared_high, 100), plot=False)
+    mag_W2_inv_high_freq, _, w_W2_inv_high_freq = control.frequency_response(1 / W2, np.logspace(w_mid, w_shared_high, 100))
     mag_W2_inv_high_freq_dB = 20 * np.log10(mag_W2_inv_high_freq) # Convert to dB
 
     # L
     L = control.minreal(P * C)
 
     # Frequency response
-    mag_L, phase_L, w_L = control.bode(L, w_shared, plot=False)
+    mag_L, phase_L, w_L = control.frequency_response(L, w_shared)
     mag_L_dB = 20 * np.log10(mag_L)
     phase_L_deg = phase_L / np.pi * 180
 
@@ -200,8 +201,8 @@ def bode_mag_rob_perf(P, C, W1, W2, w_shared):
     S = control.feedback(1, P * C, -1)
 
     # Frequency response
-    mag_S_W1, phase_S_W1, w_S_W1 = control.bode(S * W1, w_shared, plot=False)
-    mag_T_W2, phase_T_W2, w_T_W2 = control.bode(T * W2, w_shared, plot=False)
+    mag_S_W1, phase_S_W1, w_S_W1 = control.frequency_response(S * W1, w_shared)
+    mag_T_W2, phase_T_W2, w_T_W2 = control.frequency_response(T * W2, w_shared)
 
     # Combined
     mag_S_W1_plus_T_W2 = mag_S_W1 + mag_T_W2
@@ -229,11 +230,11 @@ def bode_mag_rob_perf_RD(P, C, W1, W2, w_shared):
     L = control.minreal(P * C)
 
     # Frequency response
-    mag_L, phase_L, w_L = control.bode(L, w_shared, plot=False)
-    mag_W1, phase_W1, w_W1 = control.bode(W1, w_shared, plot=False)
-    mag_L_W2, phase_L_W2, w_L_W2 = control.bode(L * W2, w_shared, plot=False)
+    mag_L, phase_L, w_L = control.frequency_response(L, w_shared)
+    mag_W1, phase_W1, w_W1 = control.frequency_response(W1, w_shared)
+    mag_L_W2, phase_L_W2, w_L_W2 = control.frequency_response(L * W2, w_shared)
     mag_W1_plus_L_W2 = mag_W1 + mag_L_W2
-    mag_RD, phase_RD, w_RD = control.bode(1 + L, w_shared, plot=False)
+    mag_RD, phase_RD, w_RD = control.frequency_response(1 + L, w_shared)
 
     mag_W1_plus_L_W2_dB = 20 * np.log10(mag_W1_plus_L_W2)
     mag_RD_dB = 20 * np.log10(mag_RD)
@@ -267,8 +268,8 @@ def bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_sh
     S = control.feedback(1, P * C, -1)
 
     # Frequency response
-    mag_T, phase_T, w_T = control.bode(T, w_shared, plot=False)
-    mag_S, phase_S, w_S = control.bode(S, w_shared, plot=False)
+    mag_T, phase_T, w_T = control.frequency_response(T, w_shared)
+    mag_S, phase_S, w_S = control.frequency_response(S, w_shared)
 
     mag_T_dB = 20 * np.log10(mag_T)
     phase_T_deg = phase_T / np.pi * 180
@@ -304,8 +305,8 @@ def bode_mag_S_T_W1_inv_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_d, w_d_h, gam
     S = control.feedback(1, P * C, -1)
 
     # Frequency response
-    mag_T, phase_T, w_T = control.bode(T, w_shared, plot=False)
-    mag_S, phase_S, w_S = control.bode(S, w_shared, plot=False)
+    mag_T, phase_T, w_T = control.frequency_response(T, w_shared)
+    mag_S, phase_S, w_S = control.frequency_response(S, w_shared)
 
     mag_T_dB = 20 * np.log10(mag_T)
     phase_T_deg = phase_T / np.pi * 180
@@ -315,8 +316,8 @@ def bode_mag_S_T_W1_inv_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_d, w_d_h, gam
     # Inverse weights and their frequency response
     W1_inv = 1 / W1
     W2_inv = 1 / W2
-    mag_W1_inv, phase_W1_inv, w_W1_inv = control.bode(W1_inv, w_shared, plot=False)
-    mag_W2_inv, phase_W2_inv, w_W2_inv = control.bode(W2_inv, w_shared, plot=False)
+    mag_W1_inv, phase_W1_inv, w_W1_inv = control.frequency_response(W1_inv, w_shared)
+    mag_W2_inv, phase_W2_inv, w_W2_inv = control.frequency_response(W2_inv, w_shared)
 
     mag_W1_inv_dB = 20 * np.log10(mag_W1_inv)
     phase_W1_inv_deg = phase_W1_inv / np.pi * 180
@@ -346,11 +347,11 @@ def bode_mag_L_P(P, C, gamma_d, w_d_h, gamma_u, w_u_l, w_shared):
     L = control.minreal(P * C)
 
     # Frequency response
-    mag_P, phase_P, w_P = control.bode(P, w_shared, plot=False)
+    mag_P, phase_P, w_P = control.frequency_response(P, w_shared)
     mag_P_dB = 20 * np.log10(mag_P)
     phase_P_deg = phase_P / np.pi * 180
 
-    mag_L, phase_L, w_L = control.bode(L, w_shared, plot=False)
+    mag_L, phase_L, w_L = control.frequency_response(L, w_shared)
     mag_L_dB = 20 * np.log10(mag_L)
     phase_L_deg = phase_L / np.pi * 180
 
@@ -384,15 +385,15 @@ def bode_mag_L_P_C(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_
     L = control.minreal(P * C)
 
     # Frequency response
-    mag_L, phase_L, w_L = control.bode(L, w_shared, plot=False)
+    mag_L, phase_L, w_L = control.frequency_response(L, w_shared)
     mag_L_dB = 20 * np.log10(mag_L)
     phase_L_deg = phase_L / np.pi * 180
 
-    mag_P, phase_P, w_P = control.bode(P, w_shared, plot=False)
+    mag_P, phase_P, w_P = control.frequency_response(P, w_shared)
     mag_P_dB = 20 * np.log10(mag_P)
     phase_P_deg = phase_P / np.pi * 180
 
-    mag_C, phase_C, w_C = control.bode(C, w_shared, plot=False)
+    mag_C, phase_C, w_C = control.frequency_response(C, w_shared)
     mag_C_dB = 20 * np.log10(mag_C)
     phase_C_deg = phase_C / np.pi * 180
 
@@ -416,7 +417,7 @@ def bode_margins(P, C, w_shared):
     L = control.minreal(P * C)
 
     # Frequency response
-    mag_L, phase_L, w_L = control.bode(L, w_shared, plot=False)
+    mag_L, phase_L, w_L = control.frequency_response(L, w_shared)
     mag_L_dB = 20 * np.log10(mag_L)
     phase_L_deg = phase_L / np.pi * 180
 
@@ -461,10 +462,10 @@ def bode_mag_Gof4(P, C, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, w_n_l, gamma_u,
     PS = control.minreal(P * S)
 
     # Freq response
-    mag_T, phase_T, w_T = control.bode(T, w_shared, plot=False)
-    mag_S, phase_S, w_S = control.bode(S, w_shared, plot=False)
-    mag_PS, phase_PS, w_PS = control.bode(PS, w_shared, plot=False)
-    mag_CS, phase_CS, w_CS = control.bode(CS, w_shared, plot=False)
+    mag_T, phase_T, w_T = control.frequency_response(T, w_shared)
+    mag_S, phase_S, w_S = control.frequency_response(S, w_shared)
+    mag_PS, phase_PS, w_PS = control.frequency_response(PS, w_shared)
+    mag_CS, phase_CS, w_CS = control.frequency_response(CS, w_shared)
 
     # Convert to dB and deg
     mag_T_dB = 20 * np.log10(mag_T)

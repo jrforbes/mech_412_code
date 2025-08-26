@@ -8,7 +8,7 @@ All custom functions ``siso_rob_perf" file.
 My use this example code for homework, the course
 project, etc. 
 
-No warrenty, responsibility, etc. 
+No warranty, responsibility, etc. 
 """
 # %%
 # Packages
@@ -53,6 +53,7 @@ w_shared = np.logspace(w_shared_low, w_shared_high, N_w)
 # Frequencies for Nyquist plot
 w_shared_low_2, w_shared_high_2, N_w_2 = -6, 6, 5000
 w_shared_2 = np.logspace(w_shared_low_2, w_shared_high_2, N_w_2)
+
 
 # %%
 # Create nominal model, uncertainty weight, and off-nominal models
@@ -118,8 +119,8 @@ ax.legend(loc='upper left')
 
 
 # %%
-# Nyquist of open-loop plant withouth control
-wmin, wmax, N_w_robust_nyq = -1, 2, 500
+# Nyquist of open-loop plant without control
+wmin, wmax, N_w_robust_nyq = -1, 2, 1000
 count, fig, ax = srp.robust_nyq(P, P_off_nom, W2, wmin, wmax, N_w_robust_nyq)
 fig.tight_layout()
 # fig.savefig('figs/nyquist_P_W2.pdf')
@@ -268,14 +269,14 @@ print(f'Vector margin is', vm, 'at frequency', wvm, '(rad/s)\n')
 fig_Gof4, ax = srp.bode_mag_Gof4(P, C, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, w_n_l, gamma_u, w_u_l, w_shared_low, w_shared_high, w_shared)
 fig_Gof4.set_size_inches(height * gr, height, forward=True)
 
+
 # Nyquist
+response = control.nyquist_response(control.minreal(P * C), omega=w_shared_2)
 fig_Nyquist, ax_Nyquist = plt.subplots()
-count, contour = control.nyquist_plot(control.minreal(P * C),
-                                      omega=w_shared_2,
-                                      plot=True,
-                                      return_contour=True)
+response.plot()
 # ax_Nyquist.axis('equal')
 fig_Nyquist.tight_layout()
+
 
 '''
 # fig_L.savefig('figs/L_C2.pdf')
@@ -344,11 +345,9 @@ fig_Gof4, ax = srp.bode_mag_Gof4(P, C, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, 
 fig_Gof4.set_size_inches(height * gr, height, forward=True)
 
 # Nyquist
+response = control.nyquist_response(control.minreal(P * C), omega=w_shared_2)
 fig_Nyquist, ax_Nyquist = plt.subplots()
-count, contour = control.nyquist_plot(control.minreal(P * C),
-                                      omega=w_shared_2,
-                                      plot=True,
-                                      return_contour=True)
+response.plot()
 # ax_Nyquist.axis('equal')
 fig_Nyquist.tight_layout()
 
@@ -420,11 +419,9 @@ fig_Gof4, ax = srp.bode_mag_Gof4(P, C, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, 
 fig_Gof4.set_size_inches(height * gr, height, forward=True)
 
 # Nyquist
+response = control.nyquist_response(control.minreal(P * C), omega=w_shared_2)
 fig_Nyquist, ax_Nyquist = plt.subplots()
-count, contour = control.nyquist_plot(control.minreal(P * C),
-                                      omega=w_shared_2,
-                                      plot=True,
-                                      return_contour=True)
+response.plot()
 # ax_Nyquist.axis('equal')
 fig_Nyquist.tight_layout()
 
@@ -445,7 +442,7 @@ fig_Nyquist.savefig('figs/Nyquist_C4.pdf')
 # %%
 # Robust Nyquist plot to assess robustness
 L_off_nom = [C * P * (1 + W2 * i / N_off_nom) for i in range(-N_off_nom, N_off_nom + 1, 1)]
-wmin, wmax, N_w_robust_nyq = 0.05, 2, 500
+wmin, wmax, N_w_robust_nyq = 0.05, 2, 1000
 count, fig, ax = srp.robust_nyq(control.minreal(P * C), L_off_nom, W2, wmin, wmax, N_w_robust_nyq)
 ax.axis('equal')
 fig.tight_layout()
@@ -455,7 +452,7 @@ fig.tight_layout()
 # References
 
 # Create command to follow
-r_max = 2
+r_max = 1
 N = np.divmod(n_t, 4)[0]
 N = n_t - N
 r = r_max * np.ones(n_t)
@@ -512,3 +509,5 @@ fig.tight_layout()
 # %%
 # Plot
 plt.show()
+
+# %%
