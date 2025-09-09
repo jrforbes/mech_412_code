@@ -175,7 +175,7 @@ def upperbound(omega: np.array,
     c_opt = result.x
 
     # Replace real parts of poles and zeros with their absolute values to ensure
-    # that W2 is BIBO/asymptotically stable and nonminimum phase.
+    # that W2 is BIBO/asymptotically stable and minimum phase.
     num_c_opt = c_opt[:degree + 1]
     num_roots = np.roots(num_c_opt)
     new_num_roots = -np.abs(np.real(num_roots)) + 1e0j * np.imag(num_roots)
@@ -186,7 +186,7 @@ def upperbound(omega: np.array,
 
     gain = num_c_opt[0] / den_c_opt[0]
 
-    # Form BIBO/asymptotically stable, nonminimum phase optimal upper bound.
+    # Form BIBO/asymptotically stable, minimum phase optimal upper bound.
     W2_opt = control.zpk(new_num_roots, new_den_roots, gain)
 
     return W2_opt
