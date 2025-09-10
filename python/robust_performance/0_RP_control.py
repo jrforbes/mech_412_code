@@ -230,7 +230,7 @@ fig_L.set_size_inches(height * gr, height, forward=True)
 ax.legend(loc='lower left')
 '''
 
-fig_S_T, ax = srp.bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)
+fig_S_T, ax = srp.bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared, Hz = True)
 ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 fig_L_W1_W2_inv, ax = srp.bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared)

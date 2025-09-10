@@ -14,6 +14,9 @@ import control
 # %%
 # Functions
 
+rps2Hz = lambda w: w / 2 / np.pi
+Hz2rps = lambda w: w * 2 * np.pi
+
 def circle(x_c, y_c, r):
     """Plot a circle."""
     # Theta, x, an y
@@ -69,7 +72,7 @@ def robust_nyq(P, P_off_nom, W2, wmin, wmax, N_w):
     return count_P, fig, ax
 
 
-def bode_mag_W1_W2(W1, W2, w_d_h, w_n_l, w_shared):
+def bode_mag_W1_W2(W1, W2, w_d_h, w_n_l, w_shared, **kwargs):
     """Plot W1 and W2."""
     # Frequency response
     mag_W1, _, _ = control.frequency_response(W1, w_shared)
@@ -80,18 +83,28 @@ def bode_mag_W1_W2(W1, W2, w_d_h, w_n_l, w_shared):
 
     # Plot
     fig, ax = plt.subplots()
-    ax.set_xlabel(r'$\omega$ (rad/s)')
     ax.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
-    ax.semilogx(w_n_l, 0, 'd', color='C6', label=r'$\omega_n$')
-    ax.semilogx(w_shared, mag_W1_dB, color='gold', label=r'$|W_1(j\omega)|$')
-    ax.semilogx(w_shared, mag_W2_dB, '-', color='seagreen', label=r'$|W_2(j \omega)|$')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax.semilogx(rps2Hz(w_d_h), 0, 'd', color='C4', label=r'$\omega_d$')
+        ax.semilogx(rps2Hz(w_n_l), 0, 'd', color='C6', label=r'$\omega_n$')
+        ax.semilogx(rps2Hz(w_shared), mag_W1_dB, color='gold', label=r'$|W_1(j\omega)|$')
+        ax.semilogx(rps2Hz(w_shared), mag_W2_dB, '-', color='seagreen', label=r'$|W_2(j \omega)|$')
+    else:
+        # Plot in rad/s
+        ax.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
+        ax.semilogx(w_n_l, 0, 'd', color='C6', label=r'$\omega_n$')
+        ax.semilogx(w_shared, mag_W1_dB, color='gold', label=r'$|W_1(j\omega)|$')
+        ax.semilogx(w_shared, mag_W2_dB, '-', color='seagreen', label=r'$|W_2(j \omega)|$')
 
     return fig, ax
 
 
-def bode_mag_W1_inv_W2_inv(W1, W2, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared):
+def bode_mag_W1_inv_W2_inv(W1, W2, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared, **kwargs):
     """Plot W1 and W2."""
     # Noise bounds
     w_r = np.logspace(w_shared_low, np.log10(w_r_h), 100)
@@ -111,20 +124,32 @@ def bode_mag_W1_inv_W2_inv(W1, W2, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shar
 
     # Plot
     fig, ax = plt.subplots()
-    ax.set_xlabel(r'$\omega$ (rad/s)')
     ax.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax.semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
-    ax.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
-    ax.semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
-    ax.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
-    ax.semilogx(w_shared, mag_W1_inv_dB, color='gold', label=r'$|W_1(j\omega)^{-1}|$')
-    ax.semilogx(w_shared, mag_W2_inv_dB, '-', color='seagreen', label=r'$|W_2(j \omega)^{-1}|$')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax.semilogx(rps2Hz(w_shared), 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax.semilogx(rps2Hz(w_d_h), 0, 'd', color='C4', label=r'$\omega_d$')
+        ax.semilogx(rps2Hz(w_r), gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax.semilogx(rps2Hz(w_n), gamma_n_dB, color='C6', label=r'$\gamma_n$')
+        ax.semilogx(rps2Hz(w_shared), mag_W1_inv_dB, color='gold', label=r'$|W_1(j\omega)^{-1}|$')
+        ax.semilogx(rps2Hz(w_shared), mag_W2_inv_dB, '-', color='seagreen', label=r'$|W_2(j \omega)^{-1}|$')
+    else:
+        # Plot in rad/s
+        ax.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax.semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
+        ax.semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
+        ax.semilogx(w_shared, mag_W1_inv_dB, color='gold', label=r'$|W_1(j\omega)^{-1}|$')
+        ax.semilogx(w_shared, mag_W2_inv_dB, '-', color='seagreen', label=r'$|W_2(j \omega)^{-1}|$')
 
     return fig, ax
 
 
-def bode_mag_L(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared):
+def bode_mag_L(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared, **kwargs):
     """Plot L."""
     # Noise bounds
     w_r = np.logspace(w_shared_low, np.log10(w_r_h), 100)
@@ -144,17 +169,26 @@ def bode_mag_L(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high
 
     # Plot open-loop TF L
     fig_L, ax_L = plt.subplots()
-    ax_L.set_xlabel(r'$\omega$ (rad/s)')
     ax_L.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax_L.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
-    ax_L.semilogx(w_r, gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
-    ax_L.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_L.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax_L.semilogx(rps2Hz(w_L), mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L.semilogx(rps2Hz(w_r), gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
+        ax_L.semilogx(rps2Hz(w_n), gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    else:
+        # Plot in rad/s
+        ax_L.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax_L.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L.semilogx(w_r, gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
+        ax_L.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
 
     return fig_L, ax_L
 
 
-def bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared):
+def bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared, **kwargs):
     """Plot L."""
     # Noise bounds
     w_r = np.logspace(w_shared_low, np.log10(w_r_h), 100)
@@ -182,19 +216,30 @@ def bode_mag_L_W1_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_
 
     # Plot open-loop TF L
     fig_L, ax_L = plt.subplots()
-    ax_L.set_xlabel(r'$\omega$ (rad/s)')
     ax_L.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax_L.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
-    ax_L.semilogx(w_W1_low_freq, mag_W1_low_freq_dB, color='gold', label=r'$|W_1(j\omega)|$')
-    ax_L.semilogx(w_W2_inv_high_freq, mag_W2_inv_high_freq_dB, color='seagreen', label=r'$|W_2(j\omega)^{-1}|$')
-    ax_L.semilogx(w_r, gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
-    ax_L.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
-
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_L.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax_L.semilogx(rps2Hz(w_L), mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L.semilogx(rps2Hz(w_W1_low_freq), mag_W1_low_freq_dB, color='gold', label=r'$|W_1(j\omega)|$')
+        ax_L.semilogx(rps2Hz(w_W2_inv_high_freq), mag_W2_inv_high_freq_dB, color='seagreen', label=r'$|W_2(j\omega)^{-1}|$')
+        ax_L.semilogx(rps2Hz(w_r), gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
+        ax_L.semilogx(rps2Hz(w_n), gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    else:
+        # Plot in rad/s
+        ax_L.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax_L.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L.semilogx(w_W1_low_freq, mag_W1_low_freq_dB, color='gold', label=r'$|W_1(j\omega)|$')
+        ax_L.semilogx(w_W2_inv_high_freq, mag_W2_inv_high_freq_dB, color='seagreen', label=r'$|W_2(j\omega)^{-1}|$')
+        ax_L.semilogx(w_r, gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
+        ax_L.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    
     return fig_L, ax_L
 
 
-def bode_mag_rob_perf(P, C, W1, W2, w_shared):
+def bode_mag_rob_perf(P, C, W1, W2, w_shared, **kwargs):
     """Plot robust performance condition."""
     # S and T
     T = control.feedback(P * C, 1, -1)
@@ -214,18 +259,27 @@ def bode_mag_rob_perf(P, C, W1, W2, w_shared):
 
     # Plot robust performance
     fig_RP, ax_RP = plt.subplots()
-    ax_RP.set_xlabel(r'$\omega$ (rad/s)')
     ax_RP.set_ylabel(r'Magnitude (dB)')
-    ax_RP.semilogx(w_S_W1, mag_S_W1_plus_T_W2_dB, '-', color='C0', label=r'$|S(j \omega) W_1(j \omega)| + |T(j \omega) W_2(j \omega)|$')
-    ax_RP.semilogx(w_shared, np.zeros(w_shared.shape[0],), '--', color='C3')
-    ax_RP.semilogx(w_shared[N_max_mag_S_W1_plus_T_W2_dB], max_mag_S_W1_plus_T_W2_dB, 'd', color='black', label=r'max value')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_RP.set_xlabel(r'$\omega$ (Hz)')
+        ax_RP.semilogx(rps2Hz(w_S_W1), mag_S_W1_plus_T_W2_dB, '-', color='C0', label=r'$|S(j \omega) W_1(j \omega)| + |T(j \omega) W_2(j \omega)|$')
+        ax_RP.semilogx(rps2Hz(w_shared), np.zeros(w_shared.shape[0],), '--', color='C3')
+        ax_RP.semilogx(rps2Hz(w_shared[N_max_mag_S_W1_plus_T_W2_dB]), max_mag_S_W1_plus_T_W2_dB, 'd', color='black', label=r'max value')
+    else:
+        # Plot in rad/s
+        ax_RP.set_xlabel(r'$\omega$ (rad/s)')
+        ax_RP.semilogx(w_S_W1, mag_S_W1_plus_T_W2_dB, '-', color='C0', label=r'$|S(j \omega) W_1(j \omega)| + |T(j \omega) W_2(j \omega)|$')
+        ax_RP.semilogx(w_shared, np.zeros(w_shared.shape[0],), '--', color='C3')
+        ax_RP.semilogx(w_shared[N_max_mag_S_W1_plus_T_W2_dB], max_mag_S_W1_plus_T_W2_dB, 'd', color='black', label=r'max value')
+    
     # ax_RP.legend(loc='best')
 
     return fig_RP, ax_RP
 
 
-def bode_mag_rob_perf_RD(P, C, W1, W2, w_shared):
-    """Plot robust performance with return difference, |1 + L(j \omega)|."""
+def bode_mag_rob_perf_RD(P, C, W1, W2, w_shared, **kwargs):
+    """Plot robust performance with return difference, |1 + L(j omega)|."""
     # L
     L = control.minreal(P * C)
 
@@ -245,16 +299,24 @@ def bode_mag_rob_perf_RD(P, C, W1, W2, w_shared):
 
     # Plot robust performance using return difference
     fig_RP_RD, ax_RP_RD = plt.subplots()
-    ax_RP_RD.set_xlabel(r'$\omega$ (rad/s)')
     ax_RP_RD.set_ylabel(r'Magnitude (dB)')
-    ax_RP_RD.semilogx(w_RD, mag_RD_dB, '-', color='C0', label=r'$|1 + L(j \omega)|$')
-    ax_RP_RD.semilogx(w_L_W2, mag_W1_plus_L_W2_dB, '--', color='C3', label=r'$|W_1(j \omega)| + |L(j \omega) W_2(j \omega)|$')
-    ax_RP_RD.semilogx(w_shared[N_min_mag_RD_dB], min_mag_RD_dB, 'd', color='black', label=r'min value')
-
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_RP_RD.set_xlabel(r'$\omega$ (Hz)')
+        ax_RP_RD.semilogx(rps2Hz(w_RD), mag_RD_dB, '-', color='C0', label=r'$|1 + L(j \omega)|$')
+        ax_RP_RD.semilogx(rps2Hz(w_L_W2), mag_W1_plus_L_W2_dB, '--', color='C3', label=r'$|W_1(j \omega)| + |L(j \omega) W_2(j \omega)|$')
+        ax_RP_RD.semilogx(rps2Hz(w_shared[N_min_mag_RD_dB]), min_mag_RD_dB, 'd', color='black', label=r'min value')
+    else:
+        # Plot in rad/s
+        ax_RP_RD.set_xlabel(r'$\omega$ (rad/s)')
+        ax_RP_RD.semilogx(w_RD, mag_RD_dB, '-', color='C0', label=r'$|1 + L(j \omega)|$')
+        ax_RP_RD.semilogx(w_L_W2, mag_W1_plus_L_W2_dB, '--', color='C3', label=r'$|W_1(j \omega)| + |L(j \omega) W_2(j \omega)|$')
+        ax_RP_RD.semilogx(w_shared[N_min_mag_RD_dB], min_mag_RD_dB, 'd', color='black', label=r'min value')
+    
     return fig_RP_RD, ax_RP_RD
 
 
-def bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared):
+def bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared, **kwargs):
     """Plot S and T."""
     # Noise bounds
     w_r = np.logspace(w_shared_low, np.log10(w_r_h), 100)
@@ -278,20 +340,32 @@ def bode_mag_S_T(P, C, gamma_r, w_r_h, w_d_h, gamma_n, w_n_l, w_shared_low, w_sh
 
     # Plot S and T
     fig_S_T, ax_S_T = plt.subplots()
-    ax_S_T.set_xlabel(r'$\omega$ (rad/s)')
     ax_S_T.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax_S_T.semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
-    ax_S_T.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
-    ax_S_T.semilogx(w_S, mag_S_dB, color='C1', label=r'$|S(j\omega)|$')
-    ax_S_T.semilogx(w_T, mag_T_dB, color='C9', label=r'$|T(j\omega)|$')
-    ax_S_T.semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
-    ax_S_T.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_S_T.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax_S_T.semilogx(rps2Hz(w_shared), 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax_S_T.semilogx(rps2Hz(w_d_h), 0, 'd', color='C4', label=r'$\omega_d$')
+        ax_S_T.semilogx(rps2Hz(w_S), mag_S_dB, color='C1', label=r'$|S(j\omega)|$')
+        ax_S_T.semilogx(rps2Hz(w_T), mag_T_dB, color='C9', label=r'$|T(j\omega)|$')
+        ax_S_T.semilogx(rps2Hz(w_r), gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax_S_T.semilogx(rps2Hz(w_n), gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    else:
+        # Plot in rad/s
+        ax_S_T.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax_S_T.semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax_S_T.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
+        ax_S_T.semilogx(w_S, mag_S_dB, color='C1', label=r'$|S(j\omega)|$')
+        ax_S_T.semilogx(w_T, mag_T_dB, color='C9', label=r'$|T(j\omega)|$')
+        ax_S_T.semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax_S_T.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
 
     return fig_S_T, ax_S_T
 
 
-def bode_mag_S_T_W1_inv_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, w_n_l, gamma_u, w_u_l, w_shared_low, w_shared_high, w_shared):
+def bode_mag_S_T_W1_inv_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, w_n_l, gamma_u, w_u_l, w_shared_low, w_shared_high, w_shared, **kwargs):
     """Plot S and T with W1^{-1} and W2^{-1}."""
     # Noise bounds
     w_r = np.logspace(w_shared_low, np.log10(w_r_h), 100)
@@ -326,22 +400,36 @@ def bode_mag_S_T_W1_inv_W2_inv(P, C, W1, W2, gamma_r, w_r_h, gamma_d, w_d_h, gam
 
     # Plot S and T
     fig_S_T, ax_S_T = plt.subplots()
-    ax_S_T.set_xlabel(r'$\omega$ (rad/s)')
     ax_S_T.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax_S_T.semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
-    ax_S_T.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
-    ax_S_T.semilogx(w_W1_inv, mag_W1_inv_dB, color='gold', label=r'$|W_1(j\omega)^{-1}|$')
-    ax_S_T.semilogx(w_W2_inv, mag_W2_inv_dB, color='seagreen', label=r'$|W_2(j\omega)^{-1}|$')
-    ax_S_T.semilogx(w_S, mag_S_dB, color='C1', label=r'$|S(j\omega)|$')
-    ax_S_T.semilogx(w_T, mag_T_dB, color='C9', label=r'$|T(j\omega)|$')
-    ax_S_T.semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
-    ax_S_T.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_S_T.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax_S_T.semilogx(rps2Hz(w_shared), 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax_S_T.semilogx(rps2Hz(w_d_h), 0, 'd', color='C4', label=r'$\omega_d$')
+        ax_S_T.semilogx(rps2Hz(w_W1_inv), mag_W1_inv_dB, color='gold', label=r'$|W_1(j\omega)^{-1}|$')
+        ax_S_T.semilogx(rps2Hz(w_W2_inv), mag_W2_inv_dB, color='seagreen', label=r'$|W_2(j\omega)^{-1}|$')
+        ax_S_T.semilogx(rps2Hz(w_S), mag_S_dB, color='C1', label=r'$|S(j\omega)|$')
+        ax_S_T.semilogx(rps2Hz(w_T), mag_T_dB, color='C9', label=r'$|T(j\omega)|$')
+        ax_S_T.semilogx(rps2Hz(w_r), gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax_S_T.semilogx(rps2Hz(w_n), gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    else:
+        # Plot in Hz
+        ax_S_T.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax_S_T.semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax_S_T.semilogx(w_d_h, 0, 'd', color='C4', label=r'$\omega_d$')
+        ax_S_T.semilogx(w_W1_inv, mag_W1_inv_dB, color='gold', label=r'$|W_1(j\omega)^{-1}|$')
+        ax_S_T.semilogx(w_W2_inv, mag_W2_inv_dB, color='seagreen', label=r'$|W_2(j\omega)^{-1}|$')
+        ax_S_T.semilogx(w_S, mag_S_dB, color='C1', label=r'$|S(j\omega)|$')
+        ax_S_T.semilogx(w_T, mag_T_dB, color='C9', label=r'$|T(j\omega)|$')
+        ax_S_T.semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax_S_T.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
 
     return fig_S_T, ax_S_T
 
 
-def bode_mag_L_P(P, C, gamma_d, w_d_h, gamma_u, w_u_l, w_shared):
+def bode_mag_L_P(P, C, gamma_d, w_d_h, gamma_u, w_u_l, w_shared, **kwargs):
     """Plot L and P to assess disturbance rejection and noise in output."""
     # L
     L = control.minreal(P * C)
@@ -360,18 +448,29 @@ def bode_mag_L_P(P, C, gamma_d, w_d_h, gamma_u, w_u_l, w_shared):
 
     # Plot L and P
     fig_L_P, ax_L_P = plt.subplots()
-    ax_L_P.set_xlabel(r'$\omega$ (rad/s)')
     ax_L_P.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax_L_P.semilogx([w_d_h, w_d_h], vertical, '--', color='C4', alpha=0.75, label=r'$20 \log(\gamma_d^{-1}) = %s$ (dB)' % np.round(20 * np.log10(1 / gamma_d), 2))
-    ax_L_P.semilogx([w_u_l, w_u_l], vertical, '-.', color='C5', alpha=0.75, label=r'$20 \log(\gamma_u^{-1}) = %s$ (dB)' % np.round(20 * np.log10(1 / gamma_u), 2))
-    ax_L_P.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
-    ax_L_P.semilogx(w_P, mag_P_dB, color='C2', label=r'$|P(j\omega)|$')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_L_P.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax_L_P.semilogx(rps2Hz(np.array([w_d_h, w_d_h])), vertical, '--', color='C4', alpha=0.75, label=r'$20 \log(\gamma_d^{-1}) = %s$ (dB)' % np.round(20 * np.log10(1 / gamma_d), 2))
+        ax_L_P.semilogx(rps2Hz(np.array([w_u_l, w_u_l])), vertical, '-.', color='C5', alpha=0.75, label=r'$20 \log(\gamma_u^{-1}) = %s$ (dB)' % np.round(20 * np.log10(1 / gamma_u), 2))
+        ax_L_P.semilogx(rps2Hz(w_L), mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L_P.semilogx(rps2Hz(w_P), mag_P_dB, color='C2', label=r'$|P(j\omega)|$')
+    else:
+        # Plot in rad/s
+        ax_L_P.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax_L_P.semilogx(np.array([w_d_h, w_d_h]), vertical, '--', color='C4', alpha=0.75, label=r'$20 \log(\gamma_d^{-1}) = %s$ (dB)' % np.round(20 * np.log10(1 / gamma_d), 2))
+        ax_L_P.semilogx(np.array([w_u_l, w_u_l]), vertical, '-.', color='C5', alpha=0.75, label=r'$20 \log(\gamma_u^{-1}) = %s$ (dB)' % np.round(20 * np.log10(1 / gamma_u), 2))
+        ax_L_P.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L_P.semilogx(w_P, mag_P_dB, color='C2', label=r'$|P(j\omega)|$')
+
 
     return fig_L_P, ax_L_P
 
 
-def bode_mag_L_P_C(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared):
+def bode_mag_L_P_C(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_high, w_shared, **kwargs):
     """Plot L, P, and C."""
     # Noise bounds
     w_r = np.logspace(w_shared_low, np.log10(w_r_h), 100)
@@ -399,19 +498,30 @@ def bode_mag_L_P_C(P, C, gamma_r, w_r_h, gamma_n, w_n_l, w_shared_low, w_shared_
 
     # Plot L, P, and C
     fig_L_P_C, ax_L_P_C = plt.subplots()
-    ax_L_P_C.set_xlabel(r'$\omega$ (rad/s)')
     ax_L_P_C.set_ylabel(r'Magnitude (dB)')
-    # Magnitude plot
-    ax_L_P_C.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
-    ax_L_P_C.semilogx(w_P, mag_P_dB, color='C2', label=r'$|P(j\omega)|$')
-    ax_L_P_C.semilogx(w_C, mag_C_dB, color='C8', label=r'$|C(j\omega)|$')
-    ax_L_P_C.semilogx(w_r, gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
-    ax_L_P_C.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
-
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        ax_L_P_C.set_xlabel(r'$\omega$ (Hz)')
+        # Magnitude plot
+        ax_L_P_C.semilogx(rps2Hz(w_L), mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L_P_C.semilogx(rps2Hz(w_P), mag_P_dB, color='C2', label=r'$|P(j\omega)|$')
+        ax_L_P_C.semilogx(rps2Hz(w_C), mag_C_dB, color='C8', label=r'$|C(j\omega)|$')
+        ax_L_P_C.semilogx(rps2Hz(w_r), gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
+        ax_L_P_C.semilogx(rps2Hz(w_n), gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    else:
+        # Plot in rad/s
+        ax_L_P_C.set_xlabel(r'$\omega$ (rad/s)')
+        # Magnitude plot
+        ax_L_P_C.semilogx(w_L, mag_L_dB, label=r'$|L(j\omega)|$')
+        ax_L_P_C.semilogx(w_P, mag_P_dB, color='C2', label=r'$|P(j\omega)|$')
+        ax_L_P_C.semilogx(w_C, mag_C_dB, color='C8', label=r'$|C(j\omega)|$')
+        ax_L_P_C.semilogx(w_r, gamma_r_inverse_dB, '-', color='C3', label=r'$1/\gamma_r$')
+        ax_L_P_C.semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
+    
     return fig_L_P_C, ax_L_P_C
 
 
-def bode_margins(P, C, w_shared):
+def bode_margins(P, C, w_shared, **kwargs):
     """Plot Bode plot with margins."""
     # L
     L = control.minreal(P * C)
@@ -427,22 +537,35 @@ def bode_margins(P, C, w_shared):
 
     # Plot Bode plot with margins
     fig_margins, ax_margins = plt.subplots(2, 1)
-    # Magnitude plot
-    ax_margins[0].semilogx(w_L, mag_L_dB)
-    ax_margins[0].semilogx(wpc, -gm_dB, 'o', color='C3')
-    ax_margins[0].set_xlabel(r'$\omega$ (rad/s)')
     ax_margins[0].set_ylabel(r'Magnitude (dB)')
-    # Phase plot
-    ax_margins[1].semilogx(w_L, phase_L_deg)
-    ax_margins[1].semilogx(wgc, pm - 180, 'd', color='C4')
-    # ax_margins[1].set_yticks(np.linspace(-180, -90, 4))
-    ax_margins[1].set_xlabel(r'$\omega$ (rad/s)')
     ax_margins[1].set_ylabel(r'Phase (deg)')
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        # Magnitude plot
+        ax_margins[0].semilogx(rps2Hz(w_L), mag_L_dB)
+        ax_margins[0].semilogx(rps2Hz(wpc), -gm_dB, 'o', color='C3')
+        ax_margins[0].set_xlabel(r'$\omega$ (Hz)')
+        # Phase plot
+        ax_margins[1].semilogx(rps2Hz(w_L), phase_L_deg)
+        ax_margins[1].semilogx(rps2Hz(wgc), pm - 180, 'd', color='C4')
+        # ax_margins[1].set_yticks(np.linspace(-180, -90, 4))
+        ax_margins[1].set_xlabel(r'$\omega$ (Hz)')
+    else:
+        # Plot in rad/s
+        # Magnitude plot
+        ax_margins[0].semilogx(w_L, mag_L_dB)
+        ax_margins[0].semilogx(wpc, -gm_dB, 'o', color='C3')
+        ax_margins[0].set_xlabel(r'$\omega$ (rad/s)')
+        # Phase plot
+        ax_margins[1].semilogx(w_L, phase_L_deg)
+        ax_margins[1].semilogx(wgc, pm - 180, 'd', color='C4')
+        # ax_margins[1].set_yticks(np.linspace(-180, -90, 4))
+        ax_margins[1].set_xlabel(r'$\omega$ (rad/s)')
 
     return fig_margins, ax_margins, gm, pm, vm, wpc, wgc, wvm
 
 
-def bode_mag_Gof4(P, C, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, w_n_l, gamma_u, w_u_l, w_shared_low, w_shared_high, w_shared):
+def bode_mag_Gof4(P, C, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, w_n_l, gamma_u, w_u_l, w_shared_low, w_shared_high, w_shared, **kwargs):
     """Plot the gang of four."""
     # Noise bounds
     w_r = np.logspace(w_shared_low, np.log10(w_r_h), 100)
@@ -478,33 +601,69 @@ def bode_mag_Gof4(P, C, gamma_r, w_r_h, gamma_d, w_d_h, gamma_n, w_n_l, gamma_u,
     phase_CS_deg = phase_CS / np.pi * 180
 
     # Gang of four
-    fig_Gof4, ax_Gof4 = plt.subplots(2, 2)
-    # Magnitude plot of S
-    ax_Gof4[0, 0].semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
-    ax_Gof4[0, 0].semilogx(w_S, mag_S_dB, color='C1')
-    ax_Gof4[0, 0].semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
-    ax_Gof4[0, 0].set_xlabel(r'$\omega$ (rad/s)')
+    fig_Gof4, ax_Gof4 = plt.subplots(2, 2)    
+    if kwargs.get("Hz", False):
+        # Plot in Hz
+        # Magnitude plot of S
+        ax_Gof4[0, 0].semilogx(rps2Hz(w_shared), 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax_Gof4[0, 0].semilogx(rps2Hz(w_S), mag_S_dB, color='C1')
+        ax_Gof4[0, 0].semilogx(rps2Hz(w_r), gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax_Gof4[0, 0].set_xlabel(r'$\omega$ (Hz)')
+
+        # Magnitude plot of P * S
+        ax_Gof4[0, 1].semilogx(rps2Hz(w_PS), mag_PS_dB)
+        ax_Gof4[0, 1].semilogx(rps2Hz(w_d), gamma_d_dB, color='C4', label=r'$\gamma_d$')
+        ax_Gof4[0, 1].set_xlabel(r'$\omega$ (Hz)')
+
+        # Magnitude plot of C * S
+        ax_Gof4[1, 0].semilogx(rps2Hz(w_CS), mag_CS_dB)
+        ax_Gof4[1, 0].semilogx(rps2Hz(w_u), gamma_u_dB, color='C5', label=r'$\gamma_u$')
+        ax_Gof4[1, 0].set_xlabel(r'$\omega$ (Hz)')
+
+        # Magnitude plot of T
+        ax_Gof4[1, 1].semilogx(rps2Hz(w_shared), 2 * np.ones(w_shared.shape[0],), '-.', color='silver')
+        ax_Gof4[1, 1].semilogx(rps2Hz(w_T), mag_T_dB, color='C9')
+        ax_Gof4[1, 1].semilogx(rps2Hz(w_n), gamma_n_dB, color='C6', label=r'$\gamma_n$')
+        ax_Gof4[1, 1].set_xlabel(r'$\omega$ (Hz)')
+
+    else:
+        # Plot in rad/s
+        # Magnitude plot of S
+        ax_Gof4[0, 0].semilogx(w_shared, 6 * np.ones(w_shared.shape[0],), '--', color='silver')
+        ax_Gof4[0, 0].semilogx(w_S, mag_S_dB, color='C1')
+        ax_Gof4[0, 0].semilogx(w_r, gamma_r_dB, color='C3', label=r'$\gamma_r$')
+        ax_Gof4[0, 0].set_xlabel(r'$\omega$ (rad/s)')
+
+        # Magnitude plot of P * S
+        ax_Gof4[0, 1].semilogx(w_PS, mag_PS_dB)
+        ax_Gof4[0, 1].semilogx(w_d, gamma_d_dB, color='C4', label=r'$\gamma_d$')
+        ax_Gof4[0, 1].set_xlabel(r'$\omega$ (rad/s)')
+
+        # Magnitude plot of C * S
+        ax_Gof4[1, 0].semilogx(w_CS, mag_CS_dB)
+        ax_Gof4[1, 0].semilogx(w_u, gamma_u_dB, color='C5', label=r'$\gamma_u$')
+        ax_Gof4[1, 0].set_xlabel(r'$\omega$ (rad/s)')
+
+        # Magnitude plot of T
+        ax_Gof4[1, 1].semilogx(w_shared, 2 * np.ones(w_shared.shape[0],), '-.', color='silver')
+        ax_Gof4[1, 1].semilogx(w_T, mag_T_dB, color='C9')
+        ax_Gof4[1, 1].semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
+        ax_Gof4[1, 1].set_xlabel(r'$\omega$ (rad/s)')
+
+    
+    # S
     ax_Gof4[0, 0].set_ylabel(r'$|S(j\omega)|$ (dB)')
     ax_Gof4[0, 0].legend(loc='lower right')
-    # Magnitude plot of P * S
-    ax_Gof4[0, 1].semilogx(w_PS, mag_PS_dB)
-    ax_Gof4[0, 1].semilogx(w_d, gamma_d_dB, color='C4', label=r'$\gamma_d$')
-    ax_Gof4[0, 1].set_xlabel(r'$\omega$ (rad/s)')
+    # P * S
     ax_Gof4[0, 1].set_ylabel(r'$|P(j\omega)S(j\omega)|$ (dB)')
     ax_Gof4[0, 1].legend(loc='lower left')
-    # Magnitude plot of C * S
-    ax_Gof4[1, 0].semilogx(w_CS, mag_CS_dB)
-    ax_Gof4[1, 0].semilogx(w_u, gamma_u_dB, color='C5', label=r'$\gamma_u$')
-    ax_Gof4[1, 0].set_xlabel(r'$\omega$ (rad/s)')
+    # C * s
     ax_Gof4[1, 0].set_ylabel(r'$|C(j\omega)S(j\omega)|$ (dB)')
     ax_Gof4[1, 0].legend(loc='upper left')
-    # Magnitude plot of T
-    ax_Gof4[1, 1].semilogx(w_shared, 2 * np.ones(w_shared.shape[0],), '-.', color='silver')
-    ax_Gof4[1, 1].semilogx(w_T, mag_T_dB, color='C9')
-    ax_Gof4[1, 1].semilogx(w_n, gamma_n_dB, color='C6', label=r'$\gamma_n$')
-    ax_Gof4[1, 1].set_xlabel(r'$\omega$ (rad/s)')
+    # T
     ax_Gof4[1, 1].set_ylabel(r'$|T(j\omega)|$ (dB)')
     ax_Gof4[1, 1].legend(loc='lower left')
+    
     fig_Gof4.tight_layout()
 
     return fig_Gof4, ax_Gof4
