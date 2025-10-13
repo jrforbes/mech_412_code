@@ -3,6 +3,7 @@
 James Forbes, Steven Dahdah, Jonathan Eid
 2023/10/07 - Initial
 2025/01/11 - Added Jonathan Eid's upper bound function. 
+2025/10/06 - Cleaned up some of Jonathan Eid's functions. 
 
 To use this module, first call:
 
@@ -78,13 +79,15 @@ def residual_max_mag(R, w_shared):
 
 
 def upperbound(omega: np.array,
-               upper_bound: np.array,
-               degree: int) -> control.TransferFunction:
+        upper_bound: np.array,
+        degree: int) -> control.TransferFunction:
     """Calculate the optimal upper bound transfer function of residuals.
 
     Form of W2 is prescribed to be
-        W2(s) = k * b(s) / a(s),
-    where k is a scalar, and a and b are monomials of given degree.
+        W2(s) = q(s) / p(s),
+    where p and q are a monomial and polynomial of given degree, respectively.
+
+    WARNING: Performance is poor due to hard-coded initial guess.
 
     Parameters
     ----------
@@ -118,7 +121,7 @@ def upperbound(omega: np.array,
         c : np.array
             Parameters of W2 for which the error is calculated.
             Form of c is 
-                [k, a_n-1, ..., a_0, b_n-1, ..., b_0].
+                [q_n, ..., q_0, p_n-1, ..., p_0].
         
         Returns
         -------
@@ -126,7 +129,8 @@ def upperbound(omega: np.array,
             Error over the frequency domain.
         """
         num_W2 = np.polyval(c[:degree + 1], 1e0j * omega)
-        den_W2 = np.polyval(np.insert(c[degree + 1 + 1:], 0, 1.0), 1e0j * omega)
+        # den_W2 = np.polyval(c[degree + 1:], 1e0j * omega)
+        den_W2 = np.polyval(np.insert(c[degree + 1:], 0, 1.0), 1e0j * omega)
         W2 = num_W2 / den_W2
         mag_W2 = np.abs(W2)
         e = mag_W2 - upper_bound
@@ -145,7 +149,7 @@ def upperbound(omega: np.array,
         c : np.array
             Parameters of W2 for which the optimization objective is calculated.
             Form of c is 
-                [k, a_n-1, ..., a_0, b_n-1, ..., b_0].
+                [q_n, ..., q_0, p_n-1, ..., p_0].
         
         Returns
         -------
@@ -158,7 +162,7 @@ def upperbound(omega: np.array,
     
     # Initial guess at W2 is a constant transfer function with value equal to
     # peak of upper bound.
-    c0 = np.zeros(2 * degree + 2)
+    c0 = np.zeros(2 * degree + 1)
     c0[degree] = upper_bound.max() + 1e-6
     c0[-1] = 1e0
 
@@ -169,24 +173,25 @@ def upperbound(omega: np.array,
         x0=list(c0),
         method='SLSQP',
         constraints=constraint,
-        options={'maxiter': 10000},
+        options={'maxiter': 100000},
     )
     
     c_opt = result.x
 
     # Replace real parts of poles and zeros with their absolute values to ensure
-    # that W2 is BIBO/asymptotically stable and minimum phase.
+    # that W2 is asymptotically stable and minimum phase.
     num_c_opt = c_opt[:degree + 1]
     num_roots = np.roots(num_c_opt)
     new_num_roots = -np.abs(np.real(num_roots)) + 1e0j * np.imag(num_roots)
 
-    den_c_opt = np.insert(c_opt[degree + 1 + 1:], 0, 1.0)
+    den_c_opt = np.insert(c_opt[degree + 1:], 0, 1.0)
     den_roots = np.roots(den_c_opt)
     new_den_roots = -np.abs(np.real(den_roots)) + 1e0j * np.imag(den_roots)
-
+    
     gain = num_c_opt[0] / den_c_opt[0]
 
-    # Form BIBO/asymptotically stable, minimum phase optimal upper bound.
+    # Form asymptotically stable, minimum phase optimal upper bound.
     W2_opt = control.zpk(new_num_roots, new_den_roots, gain)
+    W2_opt_min_real = control.minreal(W2_opt, verbose=False)
 
-    return W2_opt
+    return W2_opt_min_real

@@ -243,7 +243,7 @@ fig, ax = plt.subplots(2, 1)
 # Magnitude plot
 ax[0].semilogx(w_a, mag_a_dB)
 ax[0].set_xlabel(r'$\omega$ (rad/s)')
-ax[0].set_ylabel(r'Magnitutde (dB)')
+ax[0].set_ylabel(r'Magnitude (dB)')
 # Phase plot
 ax[1].semilogx(w_a, phase_a_deg)
 ax[1].set_xlabel(r'$\omega$ (rad/s)')

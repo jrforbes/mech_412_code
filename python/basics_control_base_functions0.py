@@ -30,7 +30,7 @@ t = np.arange(t_start, t_end, dt)
 
 # %%
 # Create systems
-# Firsr-order transfer function, P(s) = 1 / (tau * s + 1)
+# First-order transfer function, P(s) = 1 / (tau * s + 1)
 tau = 1 / 10
 P_a = control.tf([1], [tau, 1])
 

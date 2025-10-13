@@ -136,7 +136,7 @@ fig, ax = plt.subplots(2, 1)
 ax[0].semilogx(w_a, mag_a, label=r'$P_a(s)$')
 ax[0].semilogx(w_b, mag_b, label=r'$P_b(s)$')
 ax[0].set_xlabel(r'$\omega$ (rad/s)')
-ax[0].set_ylabel(r'Magnitutde (dB)')
+ax[0].set_ylabel(r'Magnitude (dB)')
 # Phase plot
 ax[1].semilogx(w_a, phase_a)
 ax[1].semilogx(w_b, phase_b)
