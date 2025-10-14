@@ -4,6 +4,7 @@ James Forbes, Steven Dahdah, Jonathan Eid
 2023/10/07 - Initial
 2025/01/11 - Added Jonathan Eid's upper bound function. 
 2025/10/06 - Cleaned up some of Jonathan Eid's functions. 
+2025/10/14 - Jonathan Eid modified code to ensure correct DC gain.
 
 To use this module, first call:
 
@@ -180,18 +181,21 @@ def upperbound(omega: np.array,
 
     # Replace real parts of poles and zeros with their absolute values to ensure
     # that W2 is asymptotically stable and minimum phase.
-    num_c_opt = c_opt[:degree + 1]
+    num_c_opt = c_opt[: degree + 1]
     num_roots = np.roots(num_c_opt)
     new_num_roots = -np.abs(np.real(num_roots)) + 1e0j * np.imag(num_roots)
 
-    den_c_opt = np.insert(c_opt[degree + 1:], 0, 1.0)
+    den_c_opt = np.insert(c_opt[degree + 1 :], 0, 1.0)
     den_roots = np.roots(den_c_opt)
     new_den_roots = -np.abs(np.real(den_roots)) + 1e0j * np.imag(den_roots)
-    
-    gain = num_c_opt[0] / den_c_opt[0]
+
+    gain_num_roots = np.prod(-new_num_roots).real
+    gain_den_roots = np.prod(-new_den_roots).real
+    dc_gain = np.abs(num_c_opt[-1] / den_c_opt[-1])
+    zpk_gain = dc_gain * gain_den_roots / gain_num_roots
 
     # Form asymptotically stable, minimum phase optimal upper bound.
-    W2_opt = control.zpk(new_num_roots, new_den_roots, gain)
+    W2_opt = control.zpk(new_num_roots, new_den_roots, zpk_gain)
     W2_opt_min_real = control.minreal(W2_opt, verbose=False)
 
     return W2_opt_min_real
