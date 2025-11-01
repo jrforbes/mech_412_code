@@ -232,7 +232,8 @@ print(f'Number of encirclements of the -1 is {count_L}.')
 
 # Plot Nyquist plot of L
 fig, ax = plt.subplots()
-response.plot()
+response.plot(ax=ax)
+ax.set_title('Nyquist Plot')
 fig.tight_layout()
 plt.show()
 # fig.savefig('figs/nyquist.pdf')
