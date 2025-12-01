@@ -140,7 +140,7 @@ print(r'w_c = ', w_c, '\n')
 
 # %%
 # 1. Gain
-k_g = 1 / np.linalg.norm((P.horner(w_c)).ravel(), 2)
+k_g = 1 / np.linalg.norm((P.horner(1j * w_c)).ravel(), 2)
 print(r'k_g = ', k_g, '\n')
 C = k_g * control.tf([1], [1])
 
